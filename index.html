@@ -9,8 +9,6 @@
 body { overflow: hidden; font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; background: #1a1a2e; }
 #canvas-container { width: 100vw; height: 100vh; }
 canvas { display: block; }
-
-/* Left panel */
 #panel {
   position: fixed; left: 0; top: 0; bottom: 0; width: 220px;
   background: linear-gradient(180deg, rgba(20,20,40,0.95), rgba(10,10,30,0.95));
@@ -23,23 +21,16 @@ canvas { display: block; }
   padding: 16px 10px 10px; border-bottom: 1px solid rgba(255,215,0,0.2);
   text-shadow: 0 0 10px rgba(255,215,0,0.5);
 }
-#dice-selector {
-  flex: 1; overflow-y: auto; padding: 10px;
-}
+#dice-selector { flex: 1; overflow-y: auto; padding: 10px; }
 .dice-row {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 8px; background: rgba(255,255,255,0.05);
   border-radius: 8px; padding: 6px 10px;
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: background 0.2s;
+  border: 1px solid rgba(255,255,255,0.08); transition: background 0.2s;
 }
 .dice-row:hover { background: rgba(255,255,255,0.1); }
-.dice-label {
-  font-size: 15px; font-weight: bold; min-width: 42px; text-align: center;
-}
-.dice-count-controls {
-  display: flex; align-items: center; gap: 6px;
-}
+.dice-label { font-size: 15px; font-weight: bold; min-width: 42px; text-align: center; }
+.dice-count-controls { display: flex; align-items: center; gap: 6px; }
 .dice-count-controls button {
   width: 28px; height: 28px; border: none; border-radius: 50%;
   background: rgba(255,255,255,0.15); color: #fff; font-size: 16px;
@@ -47,10 +38,7 @@ canvas { display: block; }
   transition: background 0.2s;
 }
 .dice-count-controls button:hover { background: rgba(255,215,0,0.4); }
-.dice-count {
-  font-size: 16px; color: #fff; min-width: 20px; text-align: center;
-}
-
+.dice-count { font-size: 16px; color: #fff; min-width: 20px; text-align: center; }
 #roll-btn {
   margin: 10px 14px 14px; padding: 12px; border: none; border-radius: 10px;
   background: linear-gradient(135deg, #ffd700, #ff8c00);
@@ -60,15 +48,12 @@ canvas { display: block; }
 }
 #roll-btn:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(255,215,0,0.5); }
 #roll-btn:active { transform: scale(0.97); }
-
 #clear-btn {
   margin: 0 14px 14px; padding: 8px; border: 1px solid rgba(255,255,255,0.2);
   border-radius: 8px; background: transparent; color: #aaa;
   font-size: 13px; cursor: pointer; transition: all 0.2s;
 }
 #clear-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-/* Results panel */
 #results {
   position: fixed; right: 0; top: 0; width: 200px;
   background: linear-gradient(180deg, rgba(20,20,40,0.92), rgba(10,10,30,0.92));
@@ -81,36 +66,26 @@ canvas { display: block; }
   margin-bottom: 12px; text-shadow: 0 0 10px rgba(255,215,0,0.5);
 }
 .result-group { margin-bottom: 10px; }
-.result-group-label {
-  font-size: 13px; font-weight: bold; margin-bottom: 4px;
-}
-.result-values {
-  display: flex; flex-wrap: wrap; gap: 4px;
-}
+.result-group-label { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+.result-values { display: flex; flex-wrap: wrap; gap: 4px; }
 .result-chip {
   padding: 2px 8px; border-radius: 4px; font-size: 13px;
   background: rgba(255,255,255,0.1); color: #eee;
 }
 #total-bar {
   margin-top: 12px; padding-top: 12px;
-  border-top: 2px solid rgba(255,215,0,0.3);
-  text-align: center;
+  border-top: 2px solid rgba(255,215,0,0.3); text-align: center;
 }
 #total-label { color: #aaa; font-size: 13px; }
 #total-value {
   color: #ffd700; font-size: 32px; font-weight: bold;
   text-shadow: 0 0 15px rgba(255,215,0,0.5);
 }
-
-/* Hint */
 #hint {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
   color: rgba(255,255,255,0.5); font-size: 14px; z-index: 10;
   pointer-events: none; transition: opacity 0.5s;
 }
-
-/* Dice colors */
-.d2  { color: #e0e0e0; }
 .d4  { color: #4fc3f7; }
 .d6  { color: #ef5350; }
 .d8  { color: #66bb6a; }
@@ -145,7 +120,6 @@ canvas { display: block; }
 <script src="https://unpkg.com/three@0.149.0/build/three.min.js"></script>
 
 <script>
-
 // ============ CONFIG ============
 const DICE_TYPES = [
   { name: 'D4',   sides: 4,   color: 0x4fc3f7, css: 'd4'  },
@@ -159,7 +133,10 @@ const DICE_TYPES = [
 
 const diceCounts = {};
 DICE_TYPES.forEach(d => diceCounts[d.name] = 0);
-diceCounts['D6'] = 2; // default
+diceCounts['D6'] = 1;
+
+const TABLE_TOP_Y = 0.15;
+const FLOOR_Y_MAP = { 4: 0.42, 6: 0.60, 8: 0.56, 10: 0.58, 12: 0.70, 20: 0.68 };
 
 // ============ BUILD UI ============
 const selectorEl = document.getElementById('dice-selector');
@@ -206,8 +183,7 @@ renderer.toneMappingExposure = 1.2;
 container.appendChild(renderer.domElement);
 
 // ============ LIGHTING ============
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-scene.add(ambientLight);
+scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
 const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
 mainLight.position.set(8, 20, 8);
@@ -233,288 +209,310 @@ scene.add(pointLight);
 // ============ TABLE ============
 function createTable() {
   const group = new THREE.Group();
-
-  // Octagonal table top
   const shape = new THREE.Shape();
   const radius = 10;
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2 - Math.PI / 8;
-    const x = Math.cos(angle) * radius;
-    const y = Math.sin(angle) * radius;
-    if (i === 0) shape.moveTo(x, y);
-    else shape.lineTo(x, y);
+    const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius;
+    if (i === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
   }
   shape.closePath();
 
-  // Green felt surface
   const feltGeom = new THREE.ExtrudeGeometry(shape, { depth: 0.3, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 3 });
-  const feltMat = new THREE.MeshStandardMaterial({
-    color: 0x1b5e20, roughness: 0.85, metalness: 0.05
-  });
-  const felt = new THREE.Mesh(feltGeom, feltMat);
+  const felt = new THREE.Mesh(feltGeom, new THREE.MeshStandardMaterial({ color: 0x1b5e20, roughness: 0.85, metalness: 0.05 }));
   felt.rotation.x = -Math.PI / 2;
   felt.position.y = -0.15;
   felt.receiveShadow = true;
   group.add(felt);
 
-  // Wooden rim
   const rimShape = new THREE.Shape();
-  const rimOuter = 10.5;
-  const rimInner = 9.8;
+  const rimOuter = 10.5, rimInner = 9.8;
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2 - Math.PI / 8;
-    const x = Math.cos(angle) * rimOuter;
-    const y = Math.sin(angle) * rimOuter;
-    if (i === 0) rimShape.moveTo(x, y);
-    else rimShape.lineTo(x, y);
+    const x = Math.cos(angle) * rimOuter, y = Math.sin(angle) * rimOuter;
+    if (i === 0) rimShape.moveTo(x, y); else rimShape.lineTo(x, y);
   }
   rimShape.closePath();
-
   const holePath = new THREE.Path();
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2 - Math.PI / 8;
-    const x = Math.cos(angle) * rimInner;
-    const y = Math.sin(angle) * rimInner;
-    if (i === 0) holePath.moveTo(x, y);
-    else holePath.lineTo(x, y);
+    const x = Math.cos(angle) * rimInner, y = Math.sin(angle) * rimInner;
+    if (i === 0) holePath.moveTo(x, y); else holePath.lineTo(x, y);
   }
   holePath.closePath();
   rimShape.holes.push(holePath);
 
-  const rimGeom = new THREE.ExtrudeGeometry(rimShape, { depth: 0.8, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05 });
-  const rimMat = new THREE.MeshStandardMaterial({
-    color: 0x5d4037, roughness: 0.6, metalness: 0.1
-  });
-  const rim = new THREE.Mesh(rimGeom, rimMat);
+  const rim = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(rimShape, { depth: 0.8, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05 }),
+    new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.6, metalness: 0.1 })
+  );
   rim.rotation.x = -Math.PI / 2;
   rim.position.y = -0.2;
-  rim.castShadow = true;
-  rim.receiveShadow = true;
+  rim.castShadow = true; rim.receiveShadow = true;
   group.add(rim);
 
-  // Raised bumper walls
   for (let i = 0; i < 8; i++) {
-    const angle1 = (i / 8) * Math.PI * 2 - Math.PI / 8;
-    const angle2 = ((i + 1) / 8) * Math.PI * 2 - Math.PI / 8;
-    const midAngle = (angle1 + angle2) / 2;
+    const a1 = (i / 8) * Math.PI * 2 - Math.PI / 8;
+    const a2 = ((i + 1) / 8) * Math.PI * 2 - Math.PI / 8;
+    const mid = (a1 + a2) / 2;
     const wallLen = 2 * rimInner * Math.sin(Math.PI / 8);
-    const wallGeom = new THREE.BoxGeometry(wallLen, 0.8, 0.3);
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x4e342e, roughness: 0.5, metalness: 0.1 });
-    const wall = new THREE.Mesh(wallGeom, wallMat);
-    const wx = Math.cos(midAngle) * (rimInner + 0.15);
-    const wz = Math.sin(midAngle) * (rimInner + 0.15);
-    wall.position.set(wx, 0.4, wz);
-    wall.rotation.y = -midAngle + Math.PI / 2;
-    wall.castShadow = true;
-    wall.receiveShadow = true;
+    const wall = new THREE.Mesh(
+      new THREE.BoxGeometry(wallLen, 0.8, 0.3),
+      new THREE.MeshStandardMaterial({ color: 0x4e342e, roughness: 0.5, metalness: 0.1 })
+    );
+    wall.position.set(Math.cos(mid) * (rimInner + 0.15), 0.4, Math.sin(mid) * (rimInner + 0.15));
+    wall.rotation.y = -mid + Math.PI / 2;
+    wall.castShadow = true; wall.receiveShadow = true;
     group.add(wall);
   }
-
   return group;
 }
+scene.add(createTable());
 
-const table = createTable();
-scene.add(table);
-
-// ============ DICE GEOMETRY BUILDERS ============
-
-function makeTextTexture(text, size, fgColor, bgColor) {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, size, size);
-  ctx.fillStyle = fgColor;
-  ctx.font = `bold ${size * 0.5}px Arial`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, size / 2, size / 2);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.encoding = THREE.sRGBEncoding;
-  return tex;
-}
-
-function hexToCSS(hex) {
-  return '#' + hex.toString(16).padStart(6, '0');
-}
-
-function darkenColor(hex, factor) {
-  const r = ((hex >> 16) & 0xff) * factor;
-  const g = ((hex >> 8) & 0xff) * factor;
-  const b = (hex & 0xff) * factor;
+// ============ HELPERS ============
+function hexToCSS(hex) { return '#' + hex.toString(16).padStart(6, '0'); }
+function darkenColor(hex, f) {
+  const r = ((hex >> 16) & 0xff) * f, g = ((hex >> 8) & 0xff) * f, b = (hex & 0xff) * f;
   return (Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(b);
 }
 
-// D6 - cube
+// Extract unique face centers and normals from non-indexed polyhedron geometry
+function extractFaces(geom) {
+  const pos = geom.attributes.position;
+  const triCount = pos.count / 3;
+  const tris = [];
+  for (let t = 0; t < triCount; t++) {
+    const i = t * 3;
+    const a = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i));
+    const b = new THREE.Vector3(pos.getX(i+1), pos.getY(i+1), pos.getZ(i+1));
+    const c = new THREE.Vector3(pos.getX(i+2), pos.getY(i+2), pos.getZ(i+2));
+    const center = new THREE.Vector3().addVectors(a, b).add(c).divideScalar(3);
+    const ab = new THREE.Vector3().subVectors(b, a);
+    const ac = new THREE.Vector3().subVectors(c, a);
+    const normal = new THREE.Vector3().crossVectors(ab, ac).normalize();
+    tris.push({ center, normal });
+  }
+  // Group by similar normal
+  const faces = [];
+  const used = new Set();
+  for (let i = 0; i < tris.length; i++) {
+    if (used.has(i)) continue;
+    const group = [tris[i]];
+    used.add(i);
+    for (let j = i + 1; j < tris.length; j++) {
+      if (used.has(j)) continue;
+      if (tris[i].normal.dot(tris[j].normal) > 0.95) {
+        group.push(tris[j]);
+        used.add(j);
+      }
+    }
+    const avg = new THREE.Vector3();
+    group.forEach(t => avg.add(t.center));
+    avg.divideScalar(group.length);
+    faces.push({ center: avg, normal: tris[i].normal.clone() });
+  }
+  return faces;
+}
+
+// Add number planes on polyhedron faces
+function addFaceDecals(mesh, faces, labels, color, size) {
+  const faceData = [];
+  for (let i = 0; i < faces.length && i < labels.length; i++) {
+    const f = faces[i];
+    const label = labels[i].toString();
+    // Canvas texture
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const ctx = c.getContext('2d');
+    // Transparent background with circle
+    ctx.clearRect(0, 0, 128, 128);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.beginPath();
+    ctx.arc(64, 64, 50, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    const fontSize = label.length > 1 ? 40 : 52;
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, 64, 64);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(size, size), mat);
+    plane.position.copy(f.center).addScaledVector(f.normal, 0.01);
+    plane.lookAt(f.center.clone().add(f.normal));
+    mesh.add(plane);
+    faceData.push({ normal: f.normal.clone(), value: parseInt(labels[i]) || 0, label: label });
+  }
+  mesh.userData.faceData = faceData;
+}
+
+// Determine die value after settling
+function getDieValue(mesh, isD4) {
+  const q = mesh.quaternion;
+  const up = new THREE.Vector3(0, 1, 0);
+  const faceData = mesh.userData.faceData;
+  if (!faceData || faceData.length === 0) return 1;
+  let bestDot = isD4 ? Infinity : -Infinity;
+  let bestValue = faceData[0].value;
+  faceData.forEach(f => {
+    const wn = f.normal.clone().applyQuaternion(q);
+    const dot = wn.dot(up);
+    if (isD4 ? (dot < bestDot) : (dot > bestDot)) {
+      bestDot = dot;
+      bestValue = f.value;
+    }
+  });
+  return bestValue;
+}
+
+// ============ D6 - Box with numbered faces ============
 function createD6(color) {
   const size = 0.9;
-  const radius = 0.1;
   const geom = new THREE.BoxGeometry(size, size, size, 4, 4, 4);
-
-  // Round the edges slightly
-  const pos = geom.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    let x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
-    const half = size / 2;
-    const len = Math.sqrt(
-      Math.max(0, Math.abs(x) - half + radius) ** 2 +
-      Math.max(0, Math.abs(y) - half + radius) ** 2 +
-      Math.max(0, Math.abs(z) - half + radius) ** 2
-    );
-    if (len > 0) {
-      const scale = 1 - (len - radius) / (len || 1) * 0.3;
-      // subtle rounding
-    }
-  }
-
   const bg = hexToCSS(darkenColor(color, 0.7));
-  const fg = '#ffffff';
-  // Pip patterns for each face
-  const pipPatterns = [
-    [[0.5, 0.5]],                                                           // 1
-    [[0.3, 0.3], [0.7, 0.7]],                                               // 2
-    [[0.3, 0.3], [0.5, 0.5], [0.7, 0.7]],                                   // 3
-    [[0.3, 0.3], [0.7, 0.3], [0.3, 0.7], [0.7, 0.7]],                       // 4
-    [[0.3, 0.3], [0.7, 0.3], [0.5, 0.5], [0.3, 0.7], [0.7, 0.7]],           // 5
-    [[0.3, 0.3], [0.7, 0.3], [0.3, 0.5], [0.7, 0.5], [0.3, 0.7], [0.7, 0.7]] // 6
+  // +x,-x,+y,-y,+z,-z → standard die: opposite faces sum to 7
+  const faceValues = [3, 4, 1, 6, 2, 5];
+  const faceNormals = [
+    new THREE.Vector3(1, 0, 0), new THREE.Vector3(-1, 0, 0),
+    new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, -1, 0),
+    new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, -1)
   ];
-
   const materials = [];
-  // Face order for BoxGeometry: +x, -x, +y, -y, +z, -z
-  const faceValues = [3, 4, 1, 6, 2, 5]; // standard die opposite faces sum to 7
+  const faceData = [];
   for (let f = 0; f < 6; f++) {
     const val = faceValues[f];
-    const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
-    const ctx = canvas.getContext('2d');
-
-    // Background with rounded corners
+    const c = document.createElement('canvas');
+    c.width = c.height = 256;
+    const ctx = c.getContext('2d');
     ctx.fillStyle = bg;
-    const r2 = 20;
+    const r = 20;
     ctx.beginPath();
-    ctx.moveTo(r2, 0); ctx.lineTo(256-r2, 0); ctx.quadraticCurveTo(256,0,256,r2);
-    ctx.lineTo(256,256-r2); ctx.quadraticCurveTo(256,256,256-r2,256);
-    ctx.lineTo(r2,256); ctx.quadraticCurveTo(0,256,0,256-r2);
-    ctx.lineTo(0,r2); ctx.quadraticCurveTo(0,0,r2,0);
-    ctx.closePath();
-    ctx.fill();
-
-    // Draw pips
-    const pips = pipPatterns[val - 1];
-    ctx.fillStyle = fg;
-    pips.forEach(([px, py]) => {
-      ctx.beginPath();
-      ctx.arc(px * 256, py * 256, 22, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    const tex = new THREE.CanvasTexture(canvas);
+    ctx.moveTo(r, 0); ctx.lineTo(256 - r, 0); ctx.quadraticCurveTo(256, 0, 256, r);
+    ctx.lineTo(256, 256 - r); ctx.quadraticCurveTo(256, 256, 256 - r, 256);
+    ctx.lineTo(r, 256); ctx.quadraticCurveTo(0, 256, 0, 256 - r);
+    ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 140px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(val.toString(), 128, 128);
+    const tex = new THREE.CanvasTexture(c);
     tex.encoding = THREE.sRGBEncoding;
-    materials.push(new THREE.MeshStandardMaterial({
-      map: tex, roughness: 0.4, metalness: 0.1
-    }));
+    materials.push(new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4, metalness: 0.1 }));
+    faceData.push({ normal: faceNormals[f], value: val });
   }
-
   const mesh = new THREE.Mesh(geom, materials);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  mesh.userData.faceData = faceData;
   return mesh;
 }
 
-// D4 - tetrahedron
-function createD4(color) {
-  const geom = new THREE.TetrahedronGeometry(0.75);
-  const bg = hexToCSS(darkenColor(color, 0.7));
-  const mat = new THREE.MeshStandardMaterial({
-    color: color, roughness: 0.35, metalness: 0.15,
-    flatShading: true
-  });
+// ============ Polyhedron dice ============
+function createPolyDie(GeomClass, radius, numFaces, color, labels, decalSize) {
+  const geom = new GeomClass(radius);
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.35, metalness: 0.15, flatShading: true });
   const mesh = new THREE.Mesh(geom, mat);
-
-  // Add number labels as sprites
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-// D8 - octahedron
-function createD8(color) {
-  const geom = new THREE.OctahedronGeometry(0.7);
-  const mat = new THREE.MeshStandardMaterial({
-    color: color, roughness: 0.35, metalness: 0.15,
-    flatShading: true
-  });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-// D10
-function createD10(color) {
-  // Pentagonal trapezohedron approximation using lathe
-  const points = [];
-  const topY = 0.9, midY = 0, botY = -0.9;
-  const midR = 0.7, tipR = 0;
-  points.push(new THREE.Vector2(tipR, topY));
-  points.push(new THREE.Vector2(midR, midY * 0.15));
-  points.push(new THREE.Vector2(tipR, botY));
-  const geom = new THREE.LatheGeometry(points, 10);
-  const mat = new THREE.MeshStandardMaterial({
-    color: color, roughness: 0.35, metalness: 0.15,
-    flatShading: true
-  });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-// D12 - dodecahedron
-function createD12(color) {
-  const geom = new THREE.DodecahedronGeometry(0.7);
-  const mat = new THREE.MeshStandardMaterial({
-    color: color, roughness: 0.35, metalness: 0.15,
-    flatShading: true
-  });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-// D20 - icosahedron
-function createD20(color) {
-  const geom = new THREE.IcosahedronGeometry(0.7);
-  const mat = new THREE.MeshStandardMaterial({
-    color: color, roughness: 0.35, metalness: 0.15,
-    flatShading: true
-  });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-// Generic die creator
-function createDieMesh(sides, color) {
-  switch (sides) {
-    case 4: return createD4(color);
-    case 6: return createD6(color);
-    case 8: return createD8(color);
-    case 10: return createD10(color);
-    case 12: return createD12(color);
-    case 20: return createD20(color);
-    case 100: return createD10(color); // D100 is a D10 visually
-    default: return createD6(color);
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  const faces = extractFaces(geom);
+  if (faces.length === numFaces) {
+    addFaceDecals(mesh, faces, labels, color, decalSize);
+  } else {
+    // Fallback: just store sequential face data
+    const faceData = [];
+    for (let i = 0; i < Math.min(faces.length, labels.length); i++) {
+      faceData.push({ normal: faces[i].normal.clone(), value: parseInt(labels[i]) || 0, label: labels[i].toString() });
+    }
+    mesh.userData.faceData = faceData;
   }
+  return mesh;
 }
 
-// ============ PHYSICS SIMULATION (Simple custom) ============
+function createD4(color) {
+  const labels = ['1', '2', '3', '4'];
+  return createPolyDie(THREE.TetrahedronGeometry, 0.75, 4, color, labels, 0.35);
+}
+function createD8(color) {
+  const labels = [];
+  for (let i = 1; i <= 8; i++) labels.push(i.toString());
+  return createPolyDie(THREE.OctahedronGeometry, 0.7, 8, color, labels, 0.30);
+}
+function createD12(color) {
+  const labels = [];
+  for (let i = 1; i <= 12; i++) labels.push(i.toString());
+  return createPolyDie(THREE.DodecahedronGeometry, 0.7, 12, color, labels, 0.28);
+}
+function createD20(color) {
+  const labels = [];
+  for (let i = 1; i <= 20; i++) labels.push(i.toString());
+  return createPolyDie(THREE.IcosahedronGeometry, 0.7, 20, color, labels, 0.24);
+}
+
+// ============ D10 ============
+function createD10(color, values, labels) {
+  values = values || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  labels = labels || values.map(v => v === 10 ? '0' : v.toString());
+  const points = [
+    new THREE.Vector2(0, 0.9),
+    new THREE.Vector2(0.7, 0),
+    new THREE.Vector2(0, -0.9)
+  ];
+  const geom = new THREE.LatheGeometry(points, 10);
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.35, metalness: 0.15, flatShading: true });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.castShadow = true; mesh.receiveShadow = true;
+
+  // Manually place labels at each of the 10 segments
+  const faceData = [];
+  for (let i = 0; i < 10; i++) {
+    const angle = ((i + 0.5) / 10) * Math.PI * 2;
+    const normal = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle));
+    const center = normal.clone().multiplyScalar(0.52);
+    faceData.push({ normal: normal.clone(), value: values[i], label: labels[i] });
+
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, 128, 128);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.beginPath(); ctx.arc(64, 64, 50, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    const fontSize = labels[i].length > 1 ? 38 : 52;
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(labels[i], 64, 64);
+    const tex = new THREE.CanvasTexture(c);
+    const planeMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.55), planeMat);
+    plane.position.copy(center).addScaledVector(normal, 0.01);
+    plane.lookAt(center.clone().add(normal));
+    mesh.add(plane);
+  }
+  mesh.userData.faceData = faceData;
+  return mesh;
+}
+
+// ============ Die creator ============
+function createDieMesh(sides, color, d100Role) {
+  if (sides === 4) return createD4(color);
+  if (sides === 6) return createD6(color);
+  if (sides === 8) return createD8(color);
+  if (sides === 12) return createD12(color);
+  if (sides === 20) return createD20(color);
+  if (sides === 10) {
+    return createD10(color);
+  }
+  if (sides === 100) {
+    // Should not be called directly - handled in rollDice
+    return createD10(color);
+  }
+  return createD6(color);
+}
+
+// ============ PHYSICS ============
 class DiePhysics {
-  constructor(mesh, startPos) {
+  constructor(mesh, startPos, sides) {
     this.mesh = mesh;
     this.position = startPos.clone();
     this.velocity = new THREE.Vector3(
@@ -522,7 +520,6 @@ class DiePhysics {
       Math.random() * 3 + 2,
       (Math.random() - 0.5) * 8
     );
-    // Random rotation axis and speed
     this.angularVel = new THREE.Vector3(
       (Math.random() - 0.5) * 15,
       (Math.random() - 0.5) * 15,
@@ -535,16 +532,12 @@ class DiePhysics {
     this.frictionDamping = 0.97;
     this.angularDamping = 0.96;
     this.tableRadius = 9.2;
-    this.floorY = 0.5; // top of table + half die size
+    this.floorY = FLOOR_Y_MAP[sides] || 0.60;
   }
 
   update(dt) {
     if (this.settled) return;
-
-    // Gravity
     this.velocity.y += this.gravity * dt;
-
-    // Update position
     this.position.addScaledVector(this.velocity, dt);
 
     // Floor collision
@@ -552,17 +545,15 @@ class DiePhysics {
       this.position.y = this.floorY;
       this.velocity.y = -this.velocity.y * this.bounceDamping;
       if (Math.abs(this.velocity.y) < 0.3) this.velocity.y = 0;
-      // Friction on bounce
       this.velocity.x *= 0.85;
       this.velocity.z *= 0.85;
       this.angularVel.multiplyScalar(0.85);
     }
 
-    // Wall collision (octagonal boundary)
+    // Wall collision
     const dist = Math.sqrt(this.position.x ** 2 + this.position.z ** 2);
     if (dist > this.tableRadius) {
-      const nx = this.position.x / dist;
-      const nz = this.position.z / dist;
+      const nx = this.position.x / dist, nz = this.position.z / dist;
       this.position.x = nx * this.tableRadius;
       this.position.z = nz * this.tableRadius;
       const dot = this.velocity.x * nx + this.velocity.z * nz;
@@ -571,23 +562,19 @@ class DiePhysics {
       this.angularVel.multiplyScalar(0.8);
     }
 
-    // Damping
     this.velocity.x *= this.frictionDamping;
     this.velocity.z *= this.frictionDamping;
     this.angularVel.multiplyScalar(this.angularDamping);
 
-    // Apply rotation
-    const rotQ = new THREE.Quaternion();
     const angLen = this.angularVel.length() * dt;
     if (angLen > 0.001) {
       const axis = this.angularVel.clone().normalize();
-      rotQ.setFromAxisAngle(axis, angLen);
+      const rotQ = new THREE.Quaternion().setFromAxisAngle(axis, angLen);
       this.mesh.quaternion.premultiply(rotQ);
     }
 
     this.mesh.position.copy(this.position);
 
-    // Check if settled
     const speed = this.velocity.length();
     const angSpeed = this.angularVel.length();
     if (speed < 0.15 && angSpeed < 0.3 && this.position.y <= this.floorY + 0.05) {
@@ -604,11 +591,15 @@ class DiePhysics {
 }
 
 // ============ GAME STATE ============
-let activeDice = []; // { mesh, physics, type, sides, value }
+let activeDice = [];
 let isRolling = false;
+let d100GroupId = 0;
 
 function clearDice() {
-  activeDice.forEach(d => scene.remove(d.mesh));
+  activeDice.forEach(d => {
+    scene.remove(d.mesh);
+    if (d.label) scene.remove(d.label);
+  });
   activeDice = [];
   document.getElementById('results').style.display = 'none';
   document.getElementById('hint').style.opacity = '1';
@@ -617,76 +608,177 @@ function clearDice() {
 function rollDice() {
   if (isRolling) return;
 
-  // Count total dice
   let totalDice = 0;
-  DICE_TYPES.forEach(dt => totalDice += diceCounts[dt.name]);
+  DICE_TYPES.forEach(dt => {
+    if (dt.sides === 100) totalDice += diceCounts[dt.name] * 2; // D100 = 2 physical dice
+    else totalDice += diceCounts[dt.name];
+  });
   if (totalDice === 0) return;
 
   clearDice();
   isRolling = true;
+  d100GroupId = 0;
   document.getElementById('hint').style.opacity = '0';
 
   let index = 0;
   DICE_TYPES.forEach(dt => {
     for (let i = 0; i < diceCounts[dt.name]; i++) {
-      const mesh = createDieMesh(dt.sides, dt.color);
-      // Start from above, spread out
-      const angle = (index / totalDice) * Math.PI * 2 + Math.random() * 0.5;
-      const r = 2 + Math.random() * 3;
-      const startPos = new THREE.Vector3(
-        Math.cos(angle) * r,
-        6 + Math.random() * 4,
-        Math.sin(angle) * r
-      );
-      mesh.position.copy(startPos);
-      // Random initial rotation
-      mesh.rotation.set(
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2
-      );
-      scene.add(mesh);
+      if (dt.sides === 100) {
+        // Spawn two D10s: tens die and ones die
+        const gid = d100GroupId++;
 
-      const physics = new DiePhysics(mesh, startPos);
-      const value = dt.sides === 100
-        ? (Math.floor(Math.random() * 10) * 10 + Math.floor(Math.random() * 10) + 1)  // 1-100
-        : Math.floor(Math.random() * dt.sides) + 1;
+        // Tens die: values 0,10,20,...,90; labels "00","10","20",...,"90"
+        const tensValues = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+        const tensLabels = ['00', '10', '20', '30', '40', '50', '60', '70', '80', '90'];
+        const tensMesh = createD10(0xffee58, tensValues, tensLabels);
+        spawnDie(tensMesh, 10, dt, index, totalDice, 'd100tens', gid);
+        index++;
 
-      activeDice.push({
-        mesh, physics, type: dt, sides: dt.sides, value
-      });
-      index++;
+        // Ones die: values 0-9; labels "0"-"9"
+        const onesValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        const onesLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        const onesMesh = createD10(0xffe082, onesValues, onesLabels);
+        spawnDie(onesMesh, 10, dt, index, totalDice, 'd100ones', gid);
+        index++;
+      } else {
+        const mesh = createDieMesh(dt.sides, dt.color);
+        spawnDie(mesh, dt.sides, dt, index, totalDice, dt.name.toLowerCase(), -1);
+        index++;
+      }
     }
   });
 }
 
+function spawnDie(mesh, physicsSides, type, index, totalDice, subtype, d100Group) {
+  const angle = (index / totalDice) * Math.PI * 2 + Math.random() * 0.5;
+  const r = 2 + Math.random() * 3;
+  const startPos = new THREE.Vector3(
+    Math.cos(angle) * r,
+    6 + Math.random() * 4,
+    Math.sin(angle) * r
+  );
+  mesh.position.copy(startPos);
+  mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+  scene.add(mesh);
+
+  const physics = new DiePhysics(mesh, startPos, physicsSides);
+  activeDice.push({
+    mesh, physics, type, sides: type.sides,
+    subtype, d100Group,
+    value: 0 // determined after settling
+  });
+}
+
+// ============ RESULTS ============
 function showResults() {
   const resultsContent = document.getElementById('results-content');
   resultsContent.innerHTML = '';
   let total = 0;
 
-  // Group by type
-  const groups = {};
+  // Determine values from physics orientation
   activeDice.forEach(d => {
-    if (!groups[d.type.name]) groups[d.type.name] = { type: d.type, values: [] };
-    groups[d.type.name].values.push(d.value);
+    const isD4 = (d.sides === 4);
+    d.value = getDieValue(d.mesh, isD4);
+  });
+
+  // Handle D100 pairs
+  const d100Pairs = {};
+  const normalDice = [];
+  activeDice.forEach(d => {
+    if (d.subtype === 'd100tens' || d.subtype === 'd100ones') {
+      if (!d100Pairs[d.d100Group]) d100Pairs[d.d100Group] = {};
+      d100Pairs[d.d100Group][d.subtype] = d;
+    } else {
+      normalDice.push(d);
+    }
+  });
+
+  // Group normal dice by type
+  const groups = {};
+  normalDice.forEach(d => {
+    const key = d.type.name;
+    if (!groups[key]) groups[key] = { type: d.type, values: [] };
+    groups[key].values.push(d.value);
     total += d.value;
   });
 
+  // D100 results
+  const d100Values = [];
+  Object.values(d100Pairs).forEach(pair => {
+    const tens = pair.d100tens ? pair.d100tens.value : 0;
+    const ones = pair.d100ones ? pair.d100ones.value : 0;
+    const result = (tens === 0 && ones === 0) ? 100 : tens + ones;
+    d100Values.push({ tens, ones, result });
+    total += result;
+  });
+
+  // Render normal dice groups
   Object.values(groups).forEach(g => {
-    const groupEl = document.createElement('div');
-    groupEl.className = 'result-group';
-    groupEl.innerHTML = `
+    const el = document.createElement('div');
+    el.className = 'result-group';
+    el.innerHTML = `
       <div class="result-group-label ${g.type.css}">${g.type.name}</div>
       <div class="result-values">
         ${g.values.map(v => `<span class="result-chip">${v}</span>`).join('')}
       </div>
     `;
-    resultsContent.appendChild(groupEl);
+    resultsContent.appendChild(el);
   });
+
+  // Render D100 results
+  if (d100Values.length > 0) {
+    const el = document.createElement('div');
+    el.className = 'result-group';
+    const chips = d100Values.map(v => {
+      const tensStr = v.tens === 0 ? '00' : v.tens.toString();
+      const onesStr = v.ones.toString();
+      return `<span class="result-chip">${tensStr}+${onesStr}=${v.result}</span>`;
+    }).join('');
+    el.innerHTML = `
+      <div class="result-group-label d100">D100</div>
+      <div class="result-values">${chips}</div>
+    `;
+    resultsContent.appendChild(el);
+  }
 
   document.getElementById('total-value').textContent = total;
   document.getElementById('results').style.display = 'block';
+}
+
+// ============ FLOATING LABEL ============
+function addNumberLabel(die) {
+  const c = document.createElement('canvas');
+  c.width = 128; c.height = 64;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  const r = 12;
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(128 - r, 0); ctx.quadraticCurveTo(128, 0, 128, r);
+  ctx.lineTo(128, 64 - r); ctx.quadraticCurveTo(128, 64, 128 - r, 64);
+  ctx.lineTo(r, 64); ctx.quadraticCurveTo(0, 64, 0, 64 - r);
+  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath(); ctx.fill();
+
+  // Display text
+  let displayText = die.value.toString();
+  if (die.subtype === 'd100tens') {
+    displayText = die.value === 0 ? '00' : die.value.toString();
+  }
+
+  const color = die.subtype === 'd100ones' ? '#ffe082' : hexToCSS(die.type.color);
+  ctx.fillStyle = color;
+  ctx.font = 'bold 36px Arial';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(displayText, 64, 32);
+
+  const texture = new THREE.CanvasTexture(c);
+  texture.encoding = THREE.sRGBEncoding;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+  sprite.scale.set(1.2, 0.6, 1);
+  sprite.position.copy(die.mesh.position);
+  sprite.position.y += 1.2;
+  scene.add(sprite);
+  die.label = sprite;
 }
 
 // ============ ANIMATION ============
@@ -705,65 +797,13 @@ function animate() {
 
     if (allSettled && activeDice.length > 0) {
       isRolling = false;
-      // Snap dice to nice orientations and show numbers
-      activeDice.forEach(d => {
-        addNumberLabel(d);
-      });
+      activeDice.forEach(d => addNumberLabel(d));
       showResults();
     }
   }
 
   renderer.render(scene, camera);
 }
-
-// Add floating number label above settled die
-function addNumberLabel(die) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 64;
-  const ctx = canvas.getContext('2d');
-
-  // Semi-transparent background
-  ctx.fillStyle = 'rgba(0,0,0,0.7)';
-  const r = 12;
-  ctx.beginPath();
-  ctx.moveTo(r, 0); ctx.lineTo(128-r, 0); ctx.quadraticCurveTo(128,0,128,r);
-  ctx.lineTo(128,64-r); ctx.quadraticCurveTo(128,64,128-r,64);
-  ctx.lineTo(r,64); ctx.quadraticCurveTo(0,64,0,64-r);
-  ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.fillStyle = hexToCSS(die.type.color);
-  ctx.font = 'bold 36px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(die.value.toString(), 64, 32);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.encoding = THREE.sRGBEncoding;
-  const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
-  const sprite = new THREE.Sprite(spriteMat);
-  sprite.scale.set(1.2, 0.6, 1);
-  sprite.position.copy(die.mesh.position);
-  sprite.position.y += 1.2;
-  scene.add(sprite);
-
-  // Store for cleanup
-  die.label = sprite;
-}
-
-// Override clear to also remove labels
-const origClear = clearDice;
-clearDice = function() {
-  activeDice.forEach(d => {
-    scene.remove(d.mesh);
-    if (d.label) scene.remove(d.label);
-  });
-  activeDice = [];
-  document.getElementById('results').style.display = 'none';
-  document.getElementById('hint').style.opacity = '1';
-};
 
 // ============ EVENTS ============
 document.getElementById('roll-btn').addEventListener('click', rollDice);
@@ -775,12 +815,8 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Keyboard shortcut
 window.addEventListener('keydown', e => {
-  if (e.code === 'Space') {
-    e.preventDefault();
-    rollDice();
-  }
+  if (e.code === 'Space') { e.preventDefault(); rollDice(); }
 });
 
 animate();
