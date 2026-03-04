@@ -142,8 +142,7 @@ canvas { display: block; }
 
 <div id="canvas-container"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/three@0.149.0/build/three.min.js"></script>
 
 <script>
 
@@ -205,14 +204,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.2;
 container.appendChild(renderer.domElement);
-
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.maxPolarAngle = Math.PI / 2.2;
-controls.minDistance = 8;
-controls.maxDistance = 35;
-controls.target.set(0, 0, 0);
 
 // ============ LIGHTING ============
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -340,7 +331,7 @@ function makeTextTexture(text, size, fgColor, bgColor) {
   ctx.textBaseline = 'middle';
   ctx.fillText(text, size / 2, size / 2);
   const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.encoding = THREE.sRGBEncoding;
   return tex;
 }
 
@@ -420,7 +411,7 @@ function createD6(color) {
     });
 
     const tex = new THREE.CanvasTexture(canvas);
-    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.encoding = THREE.sRGBEncoding;
     materials.push(new THREE.MeshStandardMaterial({
       map: tex, roughness: 0.4, metalness: 0.1
     }));
@@ -705,8 +696,6 @@ function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
 
-  controls.update();
-
   if (isRolling) {
     let allSettled = true;
     activeDice.forEach(d => {
@@ -752,7 +741,7 @@ function addNumberLabel(die) {
   ctx.fillText(die.value.toString(), 64, 32);
 
   const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.encoding = THREE.sRGBEncoding;
   const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
   const sprite = new THREE.Sprite(spriteMat);
   sprite.scale.set(1.2, 0.6, 1);
